@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to {{ site_name }}</title>
+    <style>
+        /* Reset styles */
+        body,
+        table,
+        td,
+        a {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        table,
+        td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+        }
+
+        /* Base styles */
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            background-color: #f4f7fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        /* Container */
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            padding: 50px 30px;
+            text-align: center;
+        }
+
+        .header-emoji {
+            font-size: 64px;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            color: #ffffff;
+            font-size: 16px;
+            opacity: 0.95;
+        }
+
+        /* Content */
+        .content {
+            padding: 40px 30px;
+        }
+
+        .greeting {
+            font-size: 20px;
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .message {
+            font-size: 16px;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        /* Credentials box */
+        .credentials-box {
+            background: linear-gradient(135deg, #f6f8fb 0%, #e9ecef 100%);
+            border: 2px solid #43e97b;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .credentials-title {
+            font-size: 18px;
+            color: #2d3748;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .credential-item {
+            background-color: #ffffff;
+            padding: 15px 20px;
+            margin: 12px 0;
+            border-radius: 8px;
+            border-left: 4px solid #43e97b;
+        }
+
+        .credential-label {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .credential-value {
+            font-size: 16px;
+            color: #1a202c;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Steps section */
+        .steps-section {
+            margin: 35px 0;
+        }
+
+        .steps-title {
+            font-size: 18px;
+            color: #2d3748;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .step {
+            display: table;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            display: table-cell;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: #ffffff;
+            text-align: center;
+            vertical-align: middle;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .step-content {
+            display: table-cell;
+            padding-left: 20px;
+            vertical-align: middle;
+        }
+
+        .step-text {
+            font-size: 15px;
+            color: #4a5568;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* Button */
+        .button-container {
+            text-align: center;
+            margin: 35px 0;
+        }
+
+        .action-button {
+            display: inline-block;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(67, 233, 123, 0.4);
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 233, 123, 0.5);
+        }
+
+        /* Info box */
+        .info-box {
+            background-color: #fff8e1;
+            border-left: 4px solid #fbbf24;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 4px;
+        }
+
+        .info-box p {
+            margin: 0;
+            font-size: 14px;
+            color: #78350f;
+            line-height: 1.5;
+        }
+
+        .info-box strong {
+            color: #78350f;
+        }
+
+        /* Security notice */
+        .security-notice {
+            background-color: #fff5f5;
+            border-left: 4px solid #fc8181;
+            padding: 15px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+
+        .security-notice p {
+            margin: 0;
+            font-size: 13px;
+            color: #742a2a;
+            line-height: 1.5;
+        }
+
+        /* Features section */
+        .features-section {
+            background-color: #f7fafc;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+
+        .features-title {
+            font-size: 16px;
+            color: #2d3748;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .feature {
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .feature::before {
+            content: "✓ ";
+            color: #43e97b;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #f7fafc;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .footer p {
+            margin: 5px 0;
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .footer a {
+            color: #43e97b;
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+            }
+
+            .content {
+                padding: 30px 20px !important;
+            }
+
+            .header {
+                padding: 40px 20px !important;
+            }
+
+            .header h1 {
+                font-size: 26px !important;
+            }
+
+            .header-emoji {
+                font-size: 52px !important;
+            }
+
+            .credentials-box {
+                padding: 20px 15px !important;
+            }
+
+            .action-button {
+                padding: 14px 35px !important;
+                font-size: 15px !important;
+            }
+
+            .step {
+                display: block !important;
+            }
+
+            .step-number {
+                display: inline-block !important;
+                margin-bottom: 10px !important;
+            }
+
+            .step-content {
+                display: block !important;
+                padding-left: 0 !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+        style="background-color: #f4f7fa;">
+        <tr>
+            <td style="padding: 40px 0;">
+                <table class="email-container" role="presentation" cellspacing="0" cellpadding="0" border="0"
+                    width="100%">
+                    <!-- Header -->
+                    <tr>
+                        <td class="header">
+                            <div class="header-emoji">🎉</div>
+                            <h1>Welcome to {{ site_name }}!</h1>
+                            <p>Your account has been created successfully</p>
+                        </td>
+                    </tr>
+
+                    <!-- Content -->
+                    <tr>
+                        <td class="content">
+                            <p class="greeting">Hello {{ user.first_name }} {{ user.last_name }}!</p>
+
+                            <p class="message">
+                                We're excited to have you on board! Your account has been created by our team, and we've
+                                generated temporary credentials for you to get started.
+                            </p>
+
+                            <!-- Credentials Box -->
+                            <div class="credentials-box">
+                                <div class="credentials-title">🔑 Your Login Credentials</div>
+
+                                <div class="credential-item">
+                                    <div class="credential-label">Email Address</div>
+                                    <div class="credential-value">{{ user.email }}</div>
+                                </div>
+
+                                <div class="credential-item">
+                                    <div class="credential-label">Temporary Password</div>
+                                    <div class="credential-value">{{ temp_password }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Info Box -->
+                            <div class="info-box">
+                                <p>
+                                    <strong>⏰ Your temporary password expires in {{ expiration_hours }}
+                                        hours.</strong><br>
+                                    For security reasons, you'll be required to change it upon your first login.
+                                </p>
+                            </div>
+
+                            <!-- Steps Section -->
+                            <div class="steps-section">
+                                <div class="steps-title">🚀 Getting Started (3 Easy Steps)</div>
+
+                                <div class="step">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <p class="step-text">Click the "Activate Account" button below to verify your
+                                            email and access the login page.</p>
+                                    </div>
+                                </div>
+
+                                <div class="step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <p class="step-text">Log in using your email and the temporary password provided
+                                            above.</p>
+                                    </div>
+                                </div>
+
+                                <div class="step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <p class="step-text">Create a strong, unique password to secure your account.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Activate Button -->
+                            <div class="button-container">
+                                <a href="{{ activation_url }}" class="action-button">Activate Account & Login</a>
+                            </div>
+
+                            <!-- Security Notice -->
+                            <div class="security-notice">
+                                <p>
+                                    <strong>🔒 Important Security Notice:</strong><br>
+                                    • Keep your password confidential - never share it with anyone<br>
+                                    • Change your temporary password immediately after your first login<br>
+                                    • If you didn't expect this email, please contact our support team immediately
+                                </p>
+                            </div>
+
+                            <!-- Features Section -->
+                            <div class="features-section">
+                                <div class="features-title">✨ What You Can Do:</div>
+                                <div class="feature">Access your personalized dashboard</div>
+                                <div class="feature">Manage your account settings and preferences</div>
+                                <div class="feature">Enable multi-factor authentication for extra security</div>
+                                <div class="feature">Update your profile and contact information</div>
+                            </div>
+
+                            <p class="message">
+                                If you have any questions or need assistance, our support team is here to help. Welcome
+                                aboard, and we hope you have a great experience!
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td class="footer">
+                            <p><strong>{{ site_name }}</strong></p>
+                            <p>Need help? <a href="{{ support_url }}">Contact Support</a></p>
+                            <p>This email was sent to {{ user.email }}</p>
+                            <p>&copy; {{ current_year }} {{ site_name }}. All rights reserved.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

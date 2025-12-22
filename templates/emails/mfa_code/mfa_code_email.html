@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Login Code</title>
+    <style>
+        /* Reset styles */
+        body,
+        table,
+        td,
+        a {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        table,
+        td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+        }
+
+        /* Base styles */
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            background-color: #f4f7fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        /* Container */
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        /* Content */
+        .content {
+            padding: 40px 30px;
+        }
+
+        .greeting {
+            font-size: 18px;
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .message {
+            font-size: 16px;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        /* Code display */
+        .code-container {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #e0f7ff 0%, #d4f1ff 100%);
+            border-radius: 12px;
+            border: 2px solid #4facfe;
+        }
+
+        .code-label {
+            font-size: 14px;
+            color: #4a5568;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .code {
+            font-size: 42px;
+            font-weight: 800;
+            color: #1a202c;
+            letter-spacing: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .code-hint {
+            font-size: 13px;
+            color: #718096;
+            margin-top: 15px;
+        }
+
+        /* Info box */
+        .info-box {
+            background-color: #fff8e1;
+            border-left: 4px solid #fbbf24;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 4px;
+        }
+
+        .info-box p {
+            margin: 0;
+            font-size: 14px;
+            color: #78350f;
+            line-height: 1.5;
+        }
+
+        .info-box strong {
+            color: #78350f;
+        }
+
+        /* Security notice */
+        .security-notice {
+            background-color: #fff5f5;
+            border-left: 4px solid #fc8181;
+            padding: 15px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+
+        .security-notice p {
+            margin: 0;
+            font-size: 13px;
+            color: #742a2a;
+            line-height: 1.5;
+        }
+
+        /* Request info */
+        .request-info {
+            background-color: #f0fdf4;
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            margin: 25px 0;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #064e3b;
+        }
+
+        .request-info p {
+            margin: 5px 0;
+        }
+
+        /* Tips section */
+        .tips-section {
+            background-color: #f7fafc;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .tips-section h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            color: #2d3748;
+        }
+
+        .tips-section ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .tips-section li {
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.8;
+            margin-bottom: 8px;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #f7fafc;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .footer p {
+            margin: 5px 0;
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .footer a {
+            color: #4facfe;
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+            }
+
+            .content {
+                padding: 30px 20px !important;
+            }
+
+            .header {
+                padding: 30px 20px !important;
+            }
+
+            .header h1 {
+                font-size: 24px !important;
+            }
+
+            .code {
+                font-size: 36px !important;
+                letter-spacing: 6px !important;
+            }
+
+            .code-container {
+                padding: 25px 15px !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+        style="background-color: #f4f7fa;">
+        <tr>
+            <td style="padding: 40px 0;">
+                <table class="email-container" role="presentation" cellspacing="0" cellpadding="0" border="0"
+                    width="100%">
+                    <!-- Header -->
+                    <tr>
+                        <td class="header">
+                            <h1>🔐 Two-Factor Authentication</h1>
+                        </td>
+                    </tr>
+
+                    <!-- Content -->
+                    <tr>
+                        <td class="content">
+                            <p class="greeting">Hello {{ user.first_name }}!</p>
+
+                            <p class="message">
+                                You're attempting to log in to your account. To complete the login process, please enter
+                                the verification code below. This code provides an extra layer of security for your
+                                account.
+                            </p>
+
+                            <!-- Code Display -->
+                            <div class="code-container">
+                                <div class="code-label">Your Verification Code</div>
+                                <div class="code">{{ mfa_code }}</div>
+                                <div class="code-hint">Enter this code to continue</div>
+                            </div>
+
+                            <!-- Info Box -->
+                            <div class="info-box">
+                                <p>
+                                    <strong>⏰ This code expires in {{ validity_minutes }} minutes.</strong><br>
+                                    After that, you'll need to request a new code.
+                                </p>
+                            </div>
+
+                            <!-- Request Info -->
+                            <div class="request-info">
+                                <p><strong>📋 Login Attempt Details:</strong></p>
+                                <p>Time: {{ request_time }}</p>
+                                <p>IP Address: {{ request_ip }}</p>
+                                <p>Device: {{ device_info }}</p>
+                            </div>
+
+                            <!-- Security Notice -->
+                            <div class="security-notice">
+                                <p>
+                                    <strong>🔒 Security Alert:</strong> If you didn't attempt to log in, someone may be
+                                    trying to access your account. Please change your password immediately and contact
+                                    our support team.
+                                </p>
+                            </div>
+
+                            <!-- Tips Section -->
+                            <div class="tips-section">
+                                <h3>🛡️ Security Best Practices</h3>
+                                <ul>
+                                    <li>Never share your verification code with anyone</li>
+                                    <li>Our team will never ask for your verification code</li>
+                                    <li>Keep your account secure with a strong, unique password</li>
+                                    <li>Regularly review your account activity</li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td class="footer">
+                            <p><strong>{{ site_name }}</strong></p>
+                            <p>This email was sent to {{ user.email }}</p>
+                            <p>&copy; {{ current_year }} {{ site_name }}. All rights reserved.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
