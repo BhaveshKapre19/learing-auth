@@ -1,6 +1,4 @@
 # authentication/email_service.py
-
-
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -28,7 +26,7 @@ class EmailService:
     def send_verification_email(user, token):
         context = {
             'user': user,
-            'verification_url': f"{settings.FRONTEND_BASE_URL}/verify/{token.token}",
+            'verification_url': f"{settings.FRONTEND_BASE_URL}/verify-email/{token.token}/",
             'expiration_hours': 24,
             'site_name': settings.SITE_NAME,
             'current_year': timezone.now().year,
@@ -86,7 +84,7 @@ class EmailService:
             'user': user,
             'temp_password': temp_password,
             'expiration_hours': 24,
-            'activation_url': f"{settings.FRONTEND_BASE_URL}/activate/{activation_token.token}",
+            'activation_url': f"{settings.FRONTEND_BASE_URL}/verify-email/{activation_token.token}/",
             'support_url': settings.SUPPORT_URL,
             'site_name': settings.SITE_NAME,
             'current_year': timezone.now().year,
