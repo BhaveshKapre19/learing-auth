@@ -18,7 +18,7 @@ from django.contrib.auth.models import AbstractUser , BaseUserManager
 from django.utils import timezone
 from django.utils.text import slugify
 import uuid
-from .secrets import SecretGenerator
+from authentication.services.secrets import SecretGenerator
 from datetime import timedelta
 
 
@@ -211,6 +211,7 @@ class MultiFactorAuthCode(models.Model):
 
     @classmethod
     def create_code(cls, user, validity_minutes=5):
+        cls.objects.filter(user=user).delete()
         raw_code = SecretGenerator.generate_mfa_code()
         token = SecretGenerator.generate_mfa_hash(user.email, raw_code)
 
@@ -219,6 +220,7 @@ class MultiFactorAuthCode(models.Model):
             token=token,
             expires_at=timezone.now() + timedelta(minutes=validity_minutes)
         )
+
         return obj, raw_code
 
     def validate_and_consume(self, code: str) -> bool:
@@ -279,14 +281,23 @@ class TempPasswordManager(models.Model):
     temp_password = models.CharField(max_length=20)
     created_at = models.DateTimeField(default=timezone.now)
     expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+    used_at = models.DateTimeField(null=True, blank=True)
 
-    def is_valid(self):
-        if self.user.has_temp_password is False:
+    def is_valid(self,password):
+        if self.is_used or self.user.has_temp_password is False:
+            return False
+        if password != self.temp_password:
             return False
         return timezone.now() < self.expires_at
 
     def __str__(self):
         return f"Temp Password for {self.user.email}"
+
+    def mark_as_used(self):
+        self.is_used = True
+        self.used_at = timezone.now()
+        self.save(update_fields=["is_used", "used_at"])
     
 
     @classmethod

@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.utils import timezone
 from datetime import timedelta
 from authentication.models import User, EmailVerificationToken, TempPasswordManager
-from authentication.email_service import EmailService
+from authentication.services.email_service import EmailService
 
 
 class RegisterSerializer(serializers.Serializer):

@@ -24,4 +24,14 @@ class IsEmailVerified(BasePermission):
 
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.is_email_verified
+
+
+class RequiresTempPassword(BasePermission):
+    """checks if the user has a temporary password"""
+    def has_permission(self, request, view):
+        return (
+            request.user.is_authenticated and
+            request.user.has_temp_password
+        )
+
     

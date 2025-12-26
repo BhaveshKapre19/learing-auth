@@ -10,7 +10,7 @@ from authentication.models import (
     UserProfile,
     EmailVerificationToken,
 )
-from authentication.email_service import EmailService
+from authentication.services.email_service import EmailService
 
 
 def build_absolute_media_url(request, file_field):

@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 
 from authentication.models import User, MultiFactorAuthCode
-from authentication.email_service import EmailService
+from authentication.services.email_service import EmailService
 
 
 class LoginSerializer(serializers.Serializer):

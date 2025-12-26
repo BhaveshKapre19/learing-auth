@@ -2,8 +2,8 @@
 
 from rest_framework import serializers
 from django.utils import timezone
-from authentication.models import User, PasswordResetToken
-from authentication.email_service import EmailService
+from authentication.models import User, PasswordResetToken , TempPasswordManager
+from authentication.services.email_service import EmailService
 
 
 class PasswordResetRequestSerializer(serializers.Serializer):
@@ -35,9 +35,6 @@ class PassowrdResetConfirmSerializer(serializers.Serializer):
         except PasswordResetToken.DoesNotExist:
             raise serializers.ValidationError("Invalid Token")
         
-        if not password_reset_token.is_valid():
-            raise serializers.ValidationError("Token is already used")
-
         # check expiry
         if not password_reset_token.is_valid():
             raise serializers.ValidationError("Token has expired")
@@ -57,3 +54,44 @@ class PassowrdResetConfirmSerializer(serializers.Serializer):
         password_reset_token.mark_as_used()
         return user
 
+
+class ChangeTempPasswordSerializer(serializers.Serializer):
+    temp_password = serializers.CharField(write_only=True, min_length=8)
+    password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate(self, attrs):
+        temp_password = attrs["temp_password"]
+        password = attrs["password"]
+        
+        if not temp_password:
+            raise serializers.ValidationError("Temp Password is required")
+        if not password:
+            raise serializers.ValidationError("Password is required")
+        if temp_password == password:
+            raise serializers.ValidationError("Temp Password and Password cannot be same")
+
+        user = self.context["request"].user
+        if not user.has_temp_password:
+            raise serializers.ValidationError("User does not have a temporary password")
+        
+        try:
+            tempPassObj = TempPasswordManager.objects.get(user=user, is_used=False)
+        except TempPasswordManager.DoesNotExist:
+            raise serializers.ValidationError("No active temporary password found")
+
+        if not tempPassObj.is_valid(temp_password):
+            raise serializers.ValidationError("Temporary password is already used or invalid")
+
+        attrs["temp_password_obj"] = tempPassObj
+        return attrs
+    
+    def save(self):
+        password = self.validated_data["password"]
+        tempPassObj = self.validated_data["temp_password_obj"]
+
+        user = tempPassObj.user
+        user.change_password(password)
+        user.save()
+
+        tempPassObj.mark_as_used()
+        return user

@@ -6,17 +6,14 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework import status
 from .serializers import (profile,register,password_reset)
-
-from .permissions import HasTemporaryPassword,IsActiveUser,IsEmailVerified
-
 from .models import User , EmailVerificationToken
 from django.utils import timezone
 from datetime import timedelta
-
-from email_service import EmailService
-
-
 from rest_framework.throttling import UserRateThrottle
+import uuid
+
+from authentication.services.email_service import EmailService
+from authentication.services.permissions import HasTemporaryPassword,IsActiveUser,IsEmailVerified,RequiresTempPassword
 
 class EmailResendThrottle(UserRateThrottle):
     rate = "3/hour"
@@ -51,6 +48,11 @@ class EmailVerificationView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, token, *args, **kwargs):
+        try:
+            token = uuid.UUID(token)
+        except ValueError:
+            return Response({"error": "Invalid token"}, status=400)
+
         email_token = EmailVerificationToken.objects.filter(token=token).first()
 
         if not email_token:
@@ -120,7 +122,7 @@ class RegisterUserView(APIView):
     permission_classes = [IsAdminUser]
 
     def post(self,request,*args,**kwargs):
-        serializer = register.RegisterSerializer(request.data)
+        serializer = register.RegisterSerializer(data=request.data)
 
         if not serializer.is_valid():
             return Response(
@@ -147,11 +149,11 @@ password reset view
 
 
 class PasswordResetRequestView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
+    throttle_classes = [EmailResendThrottle]
     
-    def get(self,request,*args,**kwargs):
-        user = request.user
-        password_reset = password_reset.PasswordResetRequestSerializer(request.data)
+    def post(self,request,*args,**kwargs):
+        password_reset = password_reset.PasswordResetRequestSerializer(data=request.data,context={"request": request})
         if password_reset.is_valid():
             return Response(
                 {"message":"Password Reset link send to your email please check the email for the instructions"},
@@ -168,7 +170,7 @@ class PasswordResetConfirmView(APIView):
     permission_classes = [AllowAny]
 
     def post(self,request,*args,**kwargs):
-        serializer = password_reset.PassowrdResetConfirmSerializer(request.data)
+        serializer = password_reset.PassowrdResetConfirmSerializer(data=request.data,context={"request": request})
         if serializer.is_valid():
             serializer.save()
             return Response(
@@ -183,17 +185,19 @@ class PasswordResetConfirmView(APIView):
     
         
             
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+class ChangeTempPassword(APIView):
+    permission_classes = [RequiresTempPassword]
+    
+    def post(self,request,*args,**kwargs):
+        serializer = password_reset.ChangeTempPasswordSerializer(data=request.data,context={"request": request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"message":"Password changed successfully"},
+                status=status.HTTP_200_OK
+            )
+        
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
