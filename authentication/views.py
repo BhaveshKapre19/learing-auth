@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets 
 from rest_framework.views import APIView
 from rest_framework import status
-from .serializers import (profile,register,password_reset,login)
+from .serializers import (profile,register,password_reset,login,password_reset)
 from .models import User , EmailVerificationToken , MultiFactorAuthCode
 from django.utils import timezone
 from datetime import timedelta
@@ -21,7 +21,7 @@ class EmailResendThrottle(UserRateThrottle):
 
 
 class MeView(RetrieveUpdateAPIView):
-    permission_classes = [HasTemporaryPassword,IsActiveUser,IsEmailVerified]
+    permission_classes = [IsActiveUser,IsEmailVerified]
     serializer_class = profile.MeSerializer
 
     def get_object(self):
@@ -153,15 +153,15 @@ class PasswordResetRequestView(APIView):
     throttle_classes = [EmailResendThrottle]
     
     def post(self,request,*args,**kwargs):
-        password_reset = password_reset.PasswordResetRequestSerializer(data=request.data,context={"request": request})
-        if password_reset.is_valid():
+        password_reset_obj  = password_reset.PasswordResetRequestSerializer(data=request.data,context={"request": request})
+        if password_reset_obj.is_valid():
             return Response(
                 {"message":"Password Reset link send to your email please check the email for the instructions"},
                 status=status.HTTP_200_OK
             )
         
         return Response(
-            password_reset.errors,
+            password_reset_obj.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
 

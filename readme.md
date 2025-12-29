@@ -10,6 +10,10 @@ This project is a feature-rich Content Management System (CMS) built with Django
 ## Documentation
 For detailed installation instructions, API documentation, and usage guides, please refer to the [Project Documentation](docs.md).
 
+### API Documentation
+-   **Swagger UI**: `/api/schema/swagger-ui/`
+-   **Redoc**: `/api/schema/redoc/`
+
 ## Quick Start
 1.  Activate your virtual environment.
 2.  Install requirements: `pip install -r requirements.txt`

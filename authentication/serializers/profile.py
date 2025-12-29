@@ -64,7 +64,7 @@ class MeSerializer(serializers.Serializer):
         instance = request.user
         Updates User + UserProfile in one request
         """
-        profile = instance.profile
+        profile = instance
         email_changed = False
 
         # ---- User updates ----
@@ -73,9 +73,9 @@ class MeSerializer(serializers.Serializer):
                 setattr(instance, field, validated_data[field])
 
         if "email" in validated_data and validated_data["email"] != instance.email:
-            instance.email = validated_data["email"]
-            instance.is_email_verified = False
-            instance.is_active = False
+            instance.user.email = validated_data["email"]
+            instance.user.is_email_verified = False
+            instance.user.is_active = False
             email_changed = True
 
         instance.save()
@@ -99,15 +99,14 @@ class MeSerializer(serializers.Serializer):
 
     # ---------- Output ----------
     def to_representation(self, instance):
-        profile = instance.profile
         request = self.context.get("request")
-
+        profile = instance
         return {
-            "email": instance.email,
-            "first_name": instance.first_name,
-            "last_name": instance.last_name,
-            "slug": instance.slug,
-            "is_email_verified": instance.is_email_verified,
+            "email": instance.user.email,
+            "first_name": instance.user.first_name,
+            "last_name": instance.user.last_name,
+            "slug": instance.user.slug,
+            "is_email_verified": instance.user.is_email_verified,
 
             "bio": profile.bio,
             "profile_picture": build_absolute_media_url(
