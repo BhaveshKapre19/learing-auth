@@ -5,13 +5,13 @@ from rest_framework.response import Response
 from rest_framework import viewsets 
 from rest_framework.views import APIView
 from rest_framework import status
-from .serializers import (profile,register,password_reset)
-from .models import User , EmailVerificationToken
+from .serializers import (profile,register,password_reset,login)
+from .models import User , EmailVerificationToken , MultiFactorAuthCode
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework.throttling import UserRateThrottle
 import uuid
-
+from rest_framework_simplejwt.tokens import RefreshToken
 from authentication.services.email_service import EmailService
 from authentication.services.permissions import HasTemporaryPassword,IsActiveUser,IsEmailVerified,RequiresTempPassword
 
@@ -201,3 +201,90 @@ class ChangeTempPassword(APIView):
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+
+
+
+"""
+this is the login view now
+"""
+class LoginView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = login.LoginSerializer(
+            data=request.data,
+            context={"request": request}
+        )
+
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        data = serializer.validated_data
+
+        # MFA REQUIRED → DO NOT ISSUE TOKENS
+        if data["mfa_required"]:
+            user = data["email"]
+            mfa_obj, raw_code = MultiFactorAuthCode.create_code(user,request)
+            EmailService.send_mfa_code_email(user, raw_code, request)
+            return Response(
+                {
+                    "message": "MFA verification required",
+                    "mfa_required": True,
+                    "code_sent": True,
+                    "user_email":data['email']
+                },
+                status=status.HTTP_200_OK
+            )
+
+        # NO MFA → ISSUE TOKENS
+        user = data["user"]
+
+        refresh = RefreshToken.for_user(user)
+
+        return Response(
+            {
+                "message": "Login successfully",
+                "mfa_required": False,
+                "tokens": {
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh),
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+
+
+class GetTheMFACode(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = login.GetTheMFACodeSerializer(
+            data=request.data,
+            context={"request": request}
+        )
+
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        data = serializer.validated_data
+
+        refresh = RefreshToken.for_user(data["user"])
+
+        return Response(
+            {
+                "message": "Login successfully",
+                "tokens": {
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh),
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+

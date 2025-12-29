@@ -169,5 +169,8 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'no-reply@cms.com'
 
 
-FRONTEND_BASE_URL = "http://localhost:8000/api/"
+FRONTEND_BASE_URL = "http://localhost:8000/api"
 
+
+SITE_NAME = "CMS"
+SUPPORT_URL = "http://localhost:8000/api/support"

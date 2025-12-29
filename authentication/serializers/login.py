@@ -23,15 +23,34 @@ class LoginSerializer(serializers.Serializer):
 
         # MFA flow
         if user.profile.multi_factor_enabled:
-            mfa_obj, raw_code = MultiFactorAuthCode.create_code(user)
-            EmailService.send_mfa_code_email(user, raw_code, self.context["request"])
-
             return {
                 "mfa_required": True,
-                "user_id": user.id
+                "user_id": user.id,
+                "email": user.email,
             }
 
         return {
             "mfa_required": False,
             "user": user
         }
+
+
+class GetTheMFACodeSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.CharField()
+
+    def validate(self, attrs):
+        mfa_obj = MultiFactorAuthCode.objects.filter(user__email=attrs["email"]).first()
+        if not mfa_obj:
+            raise serializers.ValidationError("Invalid credentials")
+
+        if not mfa_obj.validate_and_consume(attrs["code"]):
+            raise serializers.ValidationError("Invalid code")
+
+        return {
+            "user": mfa_obj.user,
+            "mfa_verified": True
+        }
+
+    
+

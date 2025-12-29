@@ -1,17 +1,7 @@
 """
-Docstring for authentication.models
-
-
 This module contains the models for user authentication, including custom user model,
 password reset tokens, email verification tokens, multi-factor authentication codes,
 and user profiles.
-
-the point is user slug is editable because if there is a mistake in users name or something 
-then we can change it later 
-
-
-
-
 """
 from django.db import models
 from django.contrib.auth.models import AbstractUser , BaseUserManager
@@ -20,10 +10,12 @@ from django.utils.text import slugify
 import uuid
 from authentication.services.secrets import SecretGenerator
 from datetime import timedelta
+from authentication.services.upload_path import user_profile_pic_path
 
-
-"""this is the user manager for the custom user model"""
 class UserManager(BaseUserManager):
+    """
+    User manager for the custom User model.
+    """
     use_in_migrations = True
 
     def _create_user(self, email, password, **extra_fields):
@@ -43,6 +35,10 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault('has_temp_password', False)
+        extra_fields.setdefault('is_email_verified', True)
+        extra_fields.setdefault('email_verified_at', timezone.now())
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser must have is_staff=True.')
@@ -83,12 +79,10 @@ class User(AbstractUser):
         self.has_temp_password = False
         self.save()
 
-    def set_slug(self):
-        self.slug = slugify(f"{self.first_name}-{self.last_name}-{uuid.uuid4()}")
-
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.set_slug()
+            base_slug = slugify(self.username or self.email.split('@')[0])
+            self.slug = f"{base_slug}-{uuid.uuid4().hex[:8]}"
         super().save(*args, **kwargs)
 
     class Meta:
@@ -96,17 +90,10 @@ class User(AbstractUser):
         verbose_name_plural = 'Users'
 
 
-"""
-this is the base token model for the password reset and the email verification 
-
-the token will be send to the user in the email 
-
-but the catch is the token will be stored in the database for validation
-
-and now the token will be in the url its just the one time url which will has that token
-
-"""
 class BaseToken(models.Model):
+    """
+    Base token model for password reset and email verification.
+    """
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE
@@ -163,30 +150,10 @@ class EmailVerificationToken(BaseToken):
 
 
 
-"""
-this is the login multi factor code model
-
-the user will login first with email and password
-
-then if they have multi factor enabled, a code will be generated and sent to their email
-then they will have to enter the code to complete the login process
-
-now there is a catch we need a good urls for the models views  and we can change the process or add some 
-more things later
-
-the code will be genreted and will expire in 5 minutes  
-
-the code will be the combination of the integers and the letters and some special characters
-
-this will be the good security measure for the multi factor authentication
-
-now the code will be send into the email for the user to enter it in the login process
-
-and the token is not shown to the user but the token will be strored in the database for validation
-
-"""
-
 class MultiFactorAuthCode(models.Model):
+    """
+    Model for storing Multi-Factor Authentication (MFA) codes.
+    """
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -210,15 +177,19 @@ class MultiFactorAuthCode(models.Model):
         ]
 
     @classmethod
-    def create_code(cls, user, validity_minutes=5):
+    def create_code(cls, user, request, validity_minutes=5):
         cls.objects.filter(user=user).delete()
         raw_code = SecretGenerator.generate_mfa_code()
         token = SecretGenerator.generate_mfa_hash(user.email, raw_code)
+        request_ip = request.META.get("REMOTE_ADDR", "Unknown")
+        device = request.META.get("HTTP_USER_AGENT", "Unknown Device")
 
         obj = cls.objects.create(
             user=user,
             token=token,
-            expires_at=timezone.now() + timedelta(minutes=validity_minutes)
+            expires_at=timezone.now() + timedelta(minutes=validity_minutes),
+            request_ip=request_ip,
+            device=device
         )
 
         return obj, raw_code
@@ -233,7 +204,6 @@ class MultiFactorAuthCode(models.Model):
             self.delete()
             return False
 
-        self.delete()
         return True
 
     def __str__(self):
@@ -242,14 +212,13 @@ class MultiFactorAuthCode(models.Model):
 
 
 
-"""
-this is the user profile model
-
-"""
 class UserProfile(models.Model):
+    """
+    User profile model to store additional user information.
+    """
     user = models.OneToOneField(User,on_delete=models.CASCADE,related_name="profile")
     bio = models.TextField(blank=True)
-    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
+    profile_picture = models.ImageField(upload_to=user_profile_pic_path, default="media/default/default.jpg")
     multi_factor_enabled = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
 
@@ -270,13 +239,10 @@ class UserProfile(models.Model):
 
 
 
-"""
-this is the custom password manager where there are the temp passwords are stored
-and user can chanage it after first login
-
-"""
-
 class TempPasswordManager(models.Model):
+    """
+    Manager for temporary passwords, allowing users to change password after first login.
+    """
     user = models.OneToOneField(User,on_delete=models.CASCADE,related_name="temp_password_manager")
     temp_password = models.CharField(max_length=20)
     created_at = models.DateTimeField(default=timezone.now)

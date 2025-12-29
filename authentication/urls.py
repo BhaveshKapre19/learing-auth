@@ -10,6 +10,8 @@ from .views import (
     PasswordResetRequestView,
     PasswordResetConfirmView,
     ChangeTempPassword,
+    LoginView,
+    GetTheMFACode,
 )
 
 router = DefaultRouter()
@@ -20,6 +22,9 @@ router.register(
 )
 
 urlpatterns = [
+
+    path("login/", LoginView.as_view(), name="login"),
+    path("login/verify-mfa/", GetTheMFACode.as_view(), name="login-verify-mfa"),
     # ─────────────────────────────
     # User self
     # ─────────────────────────────
