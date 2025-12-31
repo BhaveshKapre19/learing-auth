@@ -10,13 +10,15 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField()
 
     def validate(self, attrs):
-        user = authenticate(
-            email=attrs["email"],
-            password=attrs["password"]
-        )
+        user = attrs["email"]
+
+        user = User.objects.filter(email=user).first()
 
         if not user:
-            raise serializers.ValidationError("Invalid credentials")
+            raise serializers.ValidationError("Invalid Email")
+
+        if user.has_temp_password:
+            raise serializers.ValidationError("User has temporary password please reset it")
 
         if not user.is_email_verified:
             raise serializers.ValidationError("Email not verified")
@@ -27,7 +29,11 @@ class LoginSerializer(serializers.Serializer):
                 "mfa_required": True,
                 "user_id": user.id,
                 "email": user.email,
+                "user": user
             }
+
+        if not user.check_password(attrs["password"]):
+            raise serializers.ValidationError("Invalid password")
 
         return {
             "mfa_required": False,

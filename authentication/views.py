@@ -6,7 +6,7 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework import status
 from .serializers import (profile,register,password_reset,login,password_reset)
-from .models import User , EmailVerificationToken , MultiFactorAuthCode
+from .models import User , EmailVerificationToken , MultiFactorAuthCode , PasswordResetToken
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework.throttling import UserRateThrottle
@@ -48,11 +48,7 @@ class EmailVerificationView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, token, *args, **kwargs):
-        try:
-            token = uuid.UUID(token)
-        except ValueError:
-            return Response({"error": "Invalid token"}, status=400)
-
+        
         email_token = EmailVerificationToken.objects.filter(token=token).first()
 
         if not email_token:
@@ -122,6 +118,7 @@ class RegisterUserView(APIView):
     permission_classes = [IsAdminUser]
 
     def post(self,request,*args,**kwargs):
+        print(request.data)
         serializer = register.RegisterSerializer(data=request.data)
 
         if not serializer.is_valid():
@@ -170,7 +167,7 @@ class PasswordResetConfirmView(APIView):
     permission_classes = [AllowAny]
 
     def post(self,request,*args,**kwargs):
-        serializer = password_reset.PassowrdResetConfirmSerializer(data=request.data,context={"request": request})
+        serializer = password_reset.PasswordResetConfirmSerializer(data=request.data,context={"request": request})
         if serializer.is_valid():
             serializer.save()
             return Response(
@@ -217,8 +214,7 @@ class LoginView(APIView):
         )
 
         if not serializer.is_valid():
-            return Response(
-                serializer.errors,
+            return Response({"message":"Invalid credentials","errors":serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -226,7 +222,7 @@ class LoginView(APIView):
 
         # MFA REQUIRED → DO NOT ISSUE TOKENS
         if data["mfa_required"]:
-            user = data["email"]
+            user = data["user"]
             mfa_obj, raw_code = MultiFactorAuthCode.create_code(user,request)
             EmailService.send_mfa_code_email(user, raw_code, request)
             return Response(
@@ -287,4 +283,3 @@ class GetTheMFACode(APIView):
             },
             status=status.HTTP_200_OK
         )
-
